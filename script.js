@@ -262,27 +262,21 @@ function updateMemberField(sectorId, index, field, value) {
 
   saveAll();
   renderTeam();
-  syncHeroCluster();
 }
 
 function setMemberPhoto(sectorId, index, photoId) {
   const member = TEAM[sectorId].members[index];
-  const oldPhoto = member.photo;
   member.photo = photoId;
 
-  // Update all cards that shared the old photo identity by name match in other sectors
   Object.values(TEAM).forEach((sector) => {
     sector.members.forEach((other) => {
       if (other.name === member.name) other.photo = photoId;
     });
   });
 
-  // If old photo key unused, fine; custom photos stay in map
-  void oldPhoto;
   saveAll();
   closePhotoPicker();
   renderTeam();
-  syncHeroCluster();
 }
 
 function openPhotoPicker(sectorId, index) {
@@ -366,33 +360,6 @@ function resetTeamData() {
   TEAM = structuredClone(DEFAULT_TEAM);
   customPhotos = {};
   renderTeam();
-  syncHeroCluster();
-}
-
-function syncHeroCluster() {
-  const map = {
-    p1: "Lara Dantas",
-    p2: "Isadora Ribeiro",
-    p3: "Andressa Maria",
-    p4: "Marina Freire",
-    p5: "Anna Schevchenco",
-    p6: "Clarisbella Lima",
-  };
-
-  Object.entries(map).forEach(([cls, name]) => {
-    const img = document.querySelector(`.cluster-photo.${cls}`);
-    if (!img) return;
-    let photo = null;
-    Object.values(TEAM).forEach((sector) => {
-      sector.members.forEach((m) => {
-        if (m.name === name) photo = m.photo;
-      });
-    });
-    if (photo) {
-      img.src = photoSrc(photo);
-      img.alt = name;
-    }
-  });
 }
 
 function setupTabs() {
@@ -482,4 +449,3 @@ setupTabs();
 setupNav();
 setupHeaderScroll();
 renderTeam();
-syncHeroCluster();
