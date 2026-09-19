@@ -88,19 +88,18 @@ const PHOTO_LIBRARY = [
   "dante-luca",
 ];
 
-const STORAGE_TEAM = "lilas-team-data-v2";
-const STORAGE_PHOTOS = "lilas-custom-photos-v2";
+const STORAGE_TEAM = "lilas-team-data-v3";
+const STORAGE_PHOTOS = "lilas-custom-photos-v3";
+const PHOTO_VERSION = "6";
 
-let TEAM = loadTeam();
-let customPhotos = loadCustomPhotos();
-let editMode = false;
-let activeSector = "secretaria";
-let photoPickerTarget = null;
-
-// Clear outdated editor cache that still had "Secretária"
+// Clear older editor caches that remapped photos incorrectly
 try {
-  localStorage.removeItem("lilas-team-data");
-  localStorage.removeItem("lilas-custom-photos");
+  [
+    "lilas-team-data",
+    "lilas-team-data-v2",
+    "lilas-custom-photos",
+    "lilas-custom-photos-v2",
+  ].forEach((key) => localStorage.removeItem(key));
 } catch (e) {
   /* ignore */
 }
@@ -125,12 +124,16 @@ function loadCustomPhotos() {
   return {};
 }
 
+let TEAM = loadTeam();
+let customPhotos = loadCustomPhotos();
+let editMode = false;
+let activeSector = "secretaria";
+let photoPickerTarget = null;
+
 function saveAll() {
   localStorage.setItem(STORAGE_TEAM, JSON.stringify(TEAM));
   localStorage.setItem(STORAGE_PHOTOS, JSON.stringify(customPhotos));
 }
-
-const PHOTO_VERSION = "5";
 
 function photoSrc(photo) {
   if (customPhotos[photo]) return customPhotos[photo];
