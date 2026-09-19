@@ -4,8 +4,6 @@ const TEAM = {
     members: [
       { name: "Lara Dantas", course: "Fonoaudiologia", role: "Presidente", photo: "lara-dantas" },
       { name: "Isadora Ribeiro", course: "Fonoaudiologia", role: "Vice-presidente", photo: "isadora-ribeiro" },
-      { name: "Andressa Maria", course: "Psicologia", role: "Secretária", photo: "andressa-maria" },
-      { name: "Marina Freire", course: "Medicina", role: "Tesouraria", photo: "marina-freire" },
     ],
   },
   marketing: {
