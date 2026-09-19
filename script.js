@@ -130,7 +130,7 @@ function saveAll() {
   localStorage.setItem(STORAGE_PHOTOS, JSON.stringify(customPhotos));
 }
 
-const PHOTO_VERSION = "4";
+const PHOTO_VERSION = "5";
 
 function photoSrc(photo) {
   if (customPhotos[photo]) return customPhotos[photo];
