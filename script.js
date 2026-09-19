@@ -9,8 +9,8 @@ const DEFAULT_TEAM = {
   tesouraria: {
     title: "Tesouraria",
     members: [
-      { name: "Andressa Maria", course: "Psicologia", photo: "andressa-maria" },
-      { name: "Marina Freire", course: "Medicina", photo: "marina-freire" },
+      { name: "Andressa Maria", course: "Psicologia", role: "Tesouraria", photo: "andressa-maria" },
+      { name: "Marina Freire", course: "Medicina", role: "Tesouraria", photo: "marina-freire" },
     ],
   },
   marketing: {
@@ -88,14 +88,22 @@ const PHOTO_LIBRARY = [
   "dante-luca",
 ];
 
-const STORAGE_TEAM = "lilas-team-data";
-const STORAGE_PHOTOS = "lilas-custom-photos";
+const STORAGE_TEAM = "lilas-team-data-v2";
+const STORAGE_PHOTOS = "lilas-custom-photos-v2";
 
 let TEAM = loadTeam();
 let customPhotos = loadCustomPhotos();
 let editMode = false;
 let activeSector = "secretaria";
 let photoPickerTarget = null;
+
+// Clear outdated editor cache that still had "Secretária"
+try {
+  localStorage.removeItem("lilas-team-data");
+  localStorage.removeItem("lilas-custom-photos");
+} catch (e) {
+  /* ignore */
+}
 
 function loadTeam() {
   try {
