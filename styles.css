@@ -186,18 +186,127 @@ button {
   border-radius: 2px;
 }
 
-.hero {
+.encontro {
   position: relative;
-  padding: clamp(2.5rem, 6vw, 4.5rem) 0 clamp(3rem, 7vw, 5.5rem);
+  min-height: calc(100svh - var(--header));
+  display: flex;
+  align-items: center;
+  padding: clamp(2rem, 5vw, 4rem) 0 clamp(2.5rem, 6vw, 4.5rem);
   overflow: hidden;
 }
 
-.hero-bg {
+.encontro-bg {
   position: absolute;
   inset: 0;
   background:
-    linear-gradient(135deg, rgba(247, 234, 245, 0.95), rgba(255, 255, 255, 0.55) 45%, rgba(243, 228, 241, 0.8));
+    linear-gradient(180deg, rgba(247, 234, 245, 0.96), rgba(255, 255, 255, 0.7) 55%, rgba(243, 228, 241, 0.85));
   z-index: -2;
+}
+
+.encontro-frame {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  max-width: 720px;
+}
+
+.encontro-whisper,
+.encontro-name,
+.encontro-full,
+.encontro-meta,
+.encontro-seal {
+  opacity: 0;
+  transform: translateY(14px);
+  transition: opacity 0.7s ease, transform 0.7s ease;
+}
+
+.encontro-whisper.is-in,
+.encontro-name.is-in,
+.encontro-full.is-in,
+.encontro-meta.is-in,
+.encontro-seal.is-in {
+  opacity: 1;
+  transform: none;
+}
+
+.encontro-whisper {
+  margin: 0 0 0.4rem;
+  color: var(--lilac);
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  font-size: 0.76rem;
+}
+
+.encontro-hand {
+  width: min(72vw, 300px);
+}
+
+.encontro .lh-letter,
+.encontro .lh-chips {
+  display: none;
+}
+
+.encontro-name {
+  display: flex;
+  justify-content: center;
+  gap: 0.08em;
+  margin: 0.2rem 0 0;
+  font-family: "Fredoka", sans-serif;
+  font-size: clamp(3.2rem, 10vw, 5.4rem);
+  line-height: 0.92;
+  letter-spacing: 0.04em;
+  color: var(--purple);
+}
+
+.encontro-name span {
+  opacity: 0.18;
+  transform: translateY(10px);
+  transition: opacity 0.35s ease, transform 0.35s ease, text-shadow 0.35s ease;
+}
+
+.encontro-name span.is-done {
+  opacity: 1;
+  transform: none;
+}
+
+.encontro-name span.is-on {
+  opacity: 1;
+  transform: translateY(-4px);
+  text-shadow: 0 8px 0 rgba(223, 183, 218, 0.5);
+}
+
+.encontro-full {
+  margin: 0.85rem 0 0;
+  font-family: "Fredoka", sans-serif;
+  font-weight: 500;
+  font-size: clamp(1.05rem, 2.4vw, 1.3rem);
+  color: var(--text);
+  max-width: 22ch;
+}
+
+.encontro-meta {
+  margin: 0.55rem 0 0;
+  color: var(--lilac);
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  font-size: 0.78rem;
+}
+
+.encontro-seal {
+  width: 88px;
+  height: 88px;
+  border-radius: 50%;
+  margin-top: 1.15rem;
+  box-shadow:
+    0 14px 30px rgba(156, 38, 151, 0.16),
+    0 0 0 6px rgba(255, 255, 255, 0.8);
+}
+
+.encontro-seal.is-in {
+  animation: crest-breathe 6.5s ease-in-out 0.4s infinite;
 }
 
 .orb {
@@ -234,76 +343,87 @@ button {
   animation: orb-drift 11s ease-in-out infinite 1s;
 }
 
-.sign-mark {
+.hand-stage {
+  position: relative;
+  width: min(86%, 320px);
+}
+
+.lh-glow {
   position: absolute;
-  width: 88px;
-  height: 88px;
-  opacity: 0.12;
-  background:
-    radial-gradient(circle at 70% 35%, transparent 0 8px, var(--lilac) 8px 11px, transparent 12px),
-    linear-gradient(var(--lilac), var(--lilac)) 28px 38px / 36px 10px no-repeat,
-    linear-gradient(var(--lilac), var(--lilac)) 42px 18px / 10px 42px no-repeat;
-  border-radius: 40%;
-  animation: mark-float 9s ease-in-out infinite;
+  inset: 4% 8% 10%;
+  border-radius: 50%;
+  background: radial-gradient(circle at 50% 45%, rgba(255, 255, 255, 0.95) 0%, rgba(223, 183, 218, 0.42) 46%, transparent 72%);
+  pointer-events: none;
+  z-index: 0;
 }
 
-.sign-mark-a { left: 8%; bottom: 18%; }
-.sign-mark-b { right: 12%; top: 22%; animation-delay: -3s; }
-
-.hero-grid {
-  display: grid;
-  grid-template-columns: 1.05fr 0.95fr;
-  gap: clamp(2rem, 5vw, 3.5rem);
-  align-items: center;
+.lh-svg {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  height: auto;
+  overflow: visible;
+  fill: var(--gold);
+  stroke: #9a7a45;
+  stroke-width: 1.1;
 }
 
-.hero-kicker {
-  margin: 0 0 0.35rem;
-  color: var(--lilac);
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  font-size: 0.8rem;
+.lh-pad {
+  fill: #d8b87a;
+  stroke: none;
+  opacity: 0.45;
 }
 
-.hero h1 {
-  margin: 0;
+.lh-nail {
+  fill: #ead7aa;
+  stroke: #b89555;
+  stroke-width: 0.7;
+}
+
+.lh-letter {
+  margin: 0.15rem 0 0;
+  text-align: center;
   font-family: "Fredoka", sans-serif;
-  font-size: clamp(3.4rem, 9vw, 5.6rem);
-  line-height: 0.95;
-  letter-spacing: 0.02em;
+  font-size: 2.4rem;
+  line-height: 1;
   color: var(--purple);
-  text-shadow: 0 8px 0 rgba(223, 183, 218, 0.55);
+  min-height: 1.1em;
 }
 
-.hero-subtitle {
-  margin: 0.85rem 0 0;
-  font-family: "Fredoka", sans-serif;
-  font-weight: 500;
-  font-size: clamp(1.05rem, 2.4vw, 1.35rem);
-  color: var(--text);
-  max-width: 22ch;
-}
-
-.hero-lead {
-  margin: 1.1rem 0 0;
-  color: var(--text-soft);
-  font-size: 1.08rem;
-  max-width: 38ch;
-}
-
-.hero-visual {
-  position: relative;
+.lh-chips {
   display: flex;
-  align-items: center;
   justify-content: center;
-  min-height: 340px;
+  gap: 0.45rem;
+  list-style: none;
+  margin: 0.7rem 0 0;
+  padding: 0;
 }
 
-.crest-stage {
-  position: relative;
-  width: min(78%, 300px);
-  aspect-ratio: 1;
+.lh-chips li {
+  width: 1.85rem;
+  height: 1.85rem;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  border: 1.5px solid rgba(156, 38, 151, 0.22);
+  color: var(--lilac);
+  font-family: "Fredoka", sans-serif;
+  font-weight: 600;
+  font-size: 0.85rem;
+  background: rgba(255, 255, 255, 0.7);
+  transition: background 0.25s ease, color 0.25s ease, border-color 0.25s ease, transform 0.25s ease;
+}
+
+.lh-chips li.is-done {
+  border-color: rgba(156, 38, 151, 0.35);
+  color: var(--purple);
+}
+
+.lh-chips li.is-on {
+  background: var(--purple);
+  color: white;
+  border-color: var(--purple);
+  transform: translateY(-3px);
 }
 
 .crest-glow {
@@ -468,6 +588,12 @@ button {
   50% { transform: translateY(-14px) rotate(6deg); }
 }
 
+.encontro,
+.escuta,
+.section {
+  scroll-margin-top: calc(var(--header) + 0.6rem);
+}
+
 .section {
   padding: clamp(3.5rem, 8vw, 5.5rem) 0;
 }
@@ -484,21 +610,131 @@ button {
     linear-gradient(180deg, #f4e2f1, #f9eef7 50%, #f3dff0);
 }
 
-.about-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: clamp(1.5rem, 4vw, 3rem);
-  align-items: center;
+.escuta {
+  position: relative;
+  padding: clamp(4.5rem, 10vw, 7.5rem) 0 clamp(3.5rem, 8vw, 6rem);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.4), rgba(247, 234, 245, 0.92) 28%, rgba(255, 250, 252, 0.98));
 }
 
-.team-figure {
+.escuta-frame {
+  max-width: 760px;
+}
+
+.escuta-open {
+  text-align: center;
+  margin-bottom: clamp(1.8rem, 4vw, 2.8rem);
+}
+
+.escuta-whisper,
+.escuta-year,
+.escuta-hook {
+  opacity: 0;
+  transform: translateY(14px);
+  transition: opacity 0.7s ease, transform 0.7s ease;
+}
+
+.escuta-whisper.is-in,
+.escuta-year.is-in,
+.escuta-hook.is-in {
+  opacity: 1;
+  transform: none;
+}
+
+.escuta-whisper {
+  margin: 0 0 0.6rem;
+  color: var(--lilac);
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  font-size: 0.76rem;
+}
+
+.escuta-mark {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: clamp(0.6rem, 3vw, 1.4rem);
+}
+
+.escuta-hand {
+  width: min(34vw, 148px);
+  flex-shrink: 0;
+}
+
+.escuta .lh-letter,
+.escuta .lh-chips {
+  display: none;
+}
+
+.escuta-year {
+  margin: 0;
+  font-family: "Fredoka", sans-serif;
+  font-size: clamp(3.4rem, 12vw, 6.4rem);
+  line-height: 0.85;
+  letter-spacing: 0.02em;
+  color: var(--purple);
+}
+
+.escuta-hook {
+  margin: 0.85rem 0 0;
+  font-family: "Fredoka", sans-serif;
+  font-size: clamp(1.7rem, 4.2vw, 2.5rem);
+  color: var(--text);
+  font-weight: 500;
+  line-height: 1.2;
+}
+
+.escuta-story {
+  max-width: 38em;
+  margin: 0 auto 2.6rem;
+}
+
+.escuta-story p {
+  margin: 0 0 1.15rem;
+  color: var(--text-soft);
+  font-size: 1.08rem;
+}
+
+.escuta-beat {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 1rem 1.25rem;
+  align-items: baseline;
+  margin: 1.6rem 0;
+  padding: 1.15rem 0;
+  border-top: 1px solid rgba(196, 105, 185, 0.28);
+  border-bottom: 1px solid rgba(196, 105, 185, 0.28);
+}
+
+.escuta-beat p {
   margin: 0;
 }
 
-.team-figure img {
+.escuta-year-sm {
+  font-family: "Fredoka", sans-serif;
+  font-size: 1.45rem;
+  color: var(--gold);
+  letter-spacing: 0.04em;
+}
+
+.escuta-witness {
+  margin: 0;
+}
+
+.escuta-witness img {
   width: 100%;
   height: auto;
-  filter: drop-shadow(0 18px 28px rgba(156, 38, 151, 0.12));
+  border-radius: 1.6rem;
+  filter: drop-shadow(0 22px 36px rgba(156, 38, 151, 0.14));
+}
+
+.escuta-witness figcaption {
+  margin: 1rem 0 0;
+  text-align: center;
+  color: var(--lilac);
+  font-size: 0.95rem;
+  font-style: italic;
 }
 
 .eyebrow {
@@ -773,20 +1009,10 @@ h2 {
 .action-card[data-reveal]:nth-child(5) { animation-delay: 0.33s; }
 
 @media (max-width: 920px) {
-  .about-grid { grid-template-columns: 1fr; }
+  .encontro-hand,
+  .hand-stage { width: min(68vw, 240px); }
 
-  .hero-grid { grid-template-columns: 1fr; }
-
-  .hero-copy { text-align: center; }
-
-  .hero-subtitle,
-  .hero-lead {
-    max-width: none;
-    margin-left: auto;
-    margin-right: auto;
-  }
-
-  .crest-stage { width: min(62%, 240px); }
+  .escuta-hand { width: min(32vw, 128px); }
 
   .action-grid { grid-template-columns: 1fr 1fr; }
 
@@ -826,6 +1052,11 @@ h2 {
   .action-grid { grid-template-columns: 1fr; }
 
   .member-grid { grid-template-columns: repeat(2, 1fr); }
+
+  .escuta-beat {
+    grid-template-columns: 1fr;
+    gap: 0.35rem;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -856,5 +1087,24 @@ h2 {
   [data-reveal] {
     opacity: 1;
     transform: none;
+  }
+
+  .lh-chips li,
+  .encontro-whisper,
+  .encontro-name,
+  .encontro-full,
+  .encontro-meta,
+  .encontro-seal,
+  .encontro-name span,
+  .escuta-whisper,
+  .escuta-year,
+  .escuta-hook {
+    transition: none;
+    transform: none;
+    opacity: 1;
+  }
+
+  .encontro-seal {
+    animation: none;
   }
 }

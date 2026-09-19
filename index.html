@@ -30,8 +30,8 @@
       </button>
 
       <nav class="nav" id="menu" aria-label="Principal">
-        <a href="#inicio">Início</a>
-        <a href="#quem-somos">Quem somos</a>
+        <a href="#inicio">Encontro</a>
+        <a href="#escuta">A escuta</a>
         <a href="#objetivo">Objetivo</a>
         <a href="#o-que-fazemos">O que fazemos</a>
         <a href="#time">Nosso time</a>
@@ -40,71 +40,85 @@
   </header>
 
   <main id="conteudo">
-    <section class="hero" id="inicio">
-      <div class="hero-bg" aria-hidden="true">
+    <section class="encontro" id="inicio">
+      <div class="encontro-bg" aria-hidden="true">
         <span class="orb orb-a"></span>
         <span class="orb orb-b"></span>
         <span class="orb orb-c"></span>
-        <span class="sign-mark sign-mark-a"></span>
-        <span class="sign-mark sign-mark-b"></span>
       </div>
 
-      <div class="container hero-grid">
-        <div class="hero-copy is-in" data-reveal>
-          <p class="hero-kicker">CCS · UNIFOR · Time 2026.2</p>
-          <h1>LILAS</h1>
-          <p class="hero-subtitle">Liga de Libras e Atenção à Saúde da Pessoa Surda</p>
-          <p class="hero-lead">
-            Promover conhecimento sobre Libras e à saúde da pessoa surda, aproximando os estudantes das práticas inclusivas e da comunidade surda.
-          </p>
-        </div>
+      <div class="container encontro-frame">
+        <p class="encontro-whisper" data-encontro="whisper">A liga se apresenta</p>
 
-        <div class="hero-visual">
-          <div class="crest-stage" id="crest-stage" aria-hidden="true">
-            <div class="crest-glow"></div>
-            <svg class="crest-build" viewBox="0 0 320 320" role="img">
-              <defs>
-                <path id="crest-arc" d="M160,160 m-124,0 a124,124 0 1,1 248,0 a124,124 0 1,1 -248,0" />
-              </defs>
-              <circle class="crest-disc" cx="160" cy="160" r="148" />
-              <circle class="crest-ring crest-ring-outer" cx="160" cy="160" r="138" />
-              <circle class="crest-ring crest-ring-inner" cx="160" cy="160" r="128" />
-              <text class="crest-orbit">
-                <textPath href="#crest-arc" startOffset="0%">LIGA DE LIBRAS E ATENÇÃO À SAÚDE DA PESSOA SURDA · CCS UNIFOR · </textPath>
-              </text>
-              <g class="crest-hand">
-                <rect class="finger finger-a" x="58" y="138" width="42" height="13" rx="6.5" />
-                <rect class="finger finger-b" x="52" y="156" width="50" height="14" rx="7" />
-                <rect class="finger finger-c" x="58" y="175" width="42" height="13" rx="6.5" />
-                <rect class="finger finger-d" x="118" y="86" width="16" height="78" rx="8" />
-                <rect class="palm" x="70" y="150" width="78" height="40" rx="18" />
-              </g>
-              <text class="crest-ilas" x="168" y="176">ILAS</text>
-            </svg>
-            <img class="crest-official" src="assets/brand/logo.png" alt="" width="280" height="280" />
-          </div>
-          <p class="sr-only">Brasão da LILAS — Liga de Libras e Atenção à Saúde da Pessoa Surda</p>
-        </div>
+        <div
+          class="hand-stage encontro-hand"
+          id="lilas-hand"
+          role="img"
+          aria-label="Mão em datilologia da Libras soletrando LILAS"
+        ></div>
+
+        <h1 class="encontro-name" data-encontro="name" aria-label="LILAS">
+          <span data-glyph="0">L</span>
+          <span data-glyph="1">I</span>
+          <span data-glyph="2">L</span>
+          <span data-glyph="3">A</span>
+          <span data-glyph="4">S</span>
+        </h1>
+
+        <p class="encontro-full" data-encontro="full">
+          Liga de Libras e Atenção à Saúde da Pessoa Surda
+        </p>
+        <p class="encontro-meta" data-encontro="meta">CCS · UNIFOR · Time 2026.2</p>
+
+        <img
+          class="encontro-seal"
+          data-encontro="seal"
+          src="assets/brand/logo.png"
+          alt="Brasão da LILAS"
+          width="96"
+          height="96"
+        />
       </div>
     </section>
 
-    <section class="section section-white" id="quem-somos">
-      <div class="container about-grid">
-        <div data-reveal>
-          <p class="eyebrow">Sobre a liga</p>
-          <h2>Quem somos</h2>
-          <p>
-            Somos a Liga de Libras e Atenção à Saúde da Pessoa Surda (LILAS), liga acadêmica do Centro de Ciências da Saúde da Universidade de Fortaleza.
+    <section class="escuta" id="escuta">
+      <div class="container escuta-frame">
+        <header class="escuta-open">
+          <p class="escuta-whisper" data-escuta="whisper">A escuta</p>
+
+          <div class="escuta-mark">
+            <div
+              class="hand-stage escuta-hand"
+              id="escuta-hand"
+              role="img"
+              aria-label="Mão em datilologia da Libras soletrando LIGA"
+            ></div>
+            <p class="escuta-year" data-escuta="year">2020</p>
+          </div>
+
+          <h2 class="escuta-hook" data-escuta="hook">Não sabíamos cuidar.</h2>
+        </header>
+
+        <div class="escuta-story">
+          <p data-reveal>
+            Em fevereiro daquele ano, estudantes do CCS da UNIFOR não se sentiam preparados para oferecer um cuidado acessível à pessoa surda. A inquietação veio antes do nome.
           </p>
-          <p>
-            Nascemos em fevereiro de 2020, a partir da inquietação de estudantes que não se sentiam preparados para oferecer um cuidado acessível à pessoa surda. Em 2021 a LILAS se consolidou como liga e se abriu aos cursos da saúde.
-          </p>
-          <p>
-            Hoje reunimos estudantes de Fonoaudiologia, Psicologia, Medicina, Odontologia e Educação Física em torno da Libras, da inclusão e do cuidado em saúde.
+
+          <div class="escuta-beat" data-reveal>
+            <p class="escuta-year-sm">2021</p>
+            <p>
+              A inquietação virou liga. A LILAS se consolidou no Centro de Ciências da Saúde e se abriu aos cursos da área.
+            </p>
+          </div>
+
+          <p data-reveal>
+            Hoje reunimos Fonoaudiologia, Psicologia, Medicina, Odontologia e Educação Física em torno da Libras, da inclusão e do cuidado em saúde.
           </p>
         </div>
-        <figure class="team-figure" data-reveal>
+
+        <figure class="escuta-witness" data-reveal>
           <img src="assets/brand/team-hero.png" alt="Integrantes da LILAS com as camisas lilás da liga" width="1280" height="800" />
+          <figcaption>O time que carrega essa origem — testemunho, não capa.</figcaption>
         </figure>
       </div>
     </section>
@@ -209,6 +223,7 @@
     </div>
   </footer>
 
+  <script src="hand.js"></script>
   <script src="script.js"></script>
 </body>
 </html>

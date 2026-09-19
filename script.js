@@ -224,8 +224,117 @@ function setupReveal() {
   nodes.forEach((node) => observer.observe(node));
 }
 
+function setupEncontro() {
+  const el = document.getElementById("lilas-hand");
+  if (!el || !window.LilasHand) return;
+
+  const root = document.querySelector(".encontro");
+  const glyphs = [...document.querySelectorAll(".encontro-name [data-glyph]")];
+  const reveal = (name) => {
+    const node = document.querySelector(`[data-encontro="${name}"]`);
+    if (node) node.classList.add("is-in");
+  };
+
+  const hand = window.LilasHand.mount(el);
+  const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  if (root) root.classList.add("is-ready");
+  reveal("whisper");
+
+  const play = async () => {
+    if (reduced) {
+      glyphs.forEach((glyph) => glyph.classList.add("is-on"));
+      reveal("name");
+      reveal("full");
+      reveal("meta");
+      reveal("seal");
+      await hand.show("L");
+      hand.idle();
+      return;
+    }
+
+    await hand.spell("LILAS", {
+      hold: 380,
+      move: 260,
+      chips: false,
+      onLetter(index) {
+        reveal("name");
+        glyphs.forEach((glyph, i) => {
+          glyph.classList.toggle("is-on", i === index);
+          glyph.classList.toggle("is-done", i <= index);
+        });
+      },
+    });
+
+    await hand.show("L");
+    reveal("full");
+    window.setTimeout(() => reveal("meta"), 180);
+    window.setTimeout(() => reveal("seal"), 360);
+    hand.idle();
+  };
+
+  play();
+}
+
+function setupEscuta() {
+  const el = document.getElementById("escuta-hand");
+  const section = document.getElementById("escuta");
+  if (!el || !section || !window.LilasHand) return;
+
+  const reveal = (name) => {
+    const node = document.querySelector(`[data-escuta="${name}"]`);
+    if (node) node.classList.add("is-in");
+  };
+
+  const hand = window.LilasHand.mount(el);
+  const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  let played = false;
+
+  const play = async () => {
+    if (played) return;
+    played = true;
+    reveal("whisper");
+    reveal("year");
+    reveal("hook");
+
+    if (reduced) {
+      await hand.show("L");
+      hand.idle();
+      return;
+    }
+
+    await hand.spell("LIGA", {
+      hold: 340,
+      move: 240,
+      chips: false,
+    });
+    await hand.show("L");
+    hand.idle();
+  };
+
+  if (reduced) {
+    play();
+    return;
+  }
+
+  const observer = new IntersectionObserver(
+    (entries) => {
+      entries.forEach((entry) => {
+        if (!entry.isIntersecting) return;
+        play();
+        observer.disconnect();
+      });
+    },
+    { threshold: 0.28, rootMargin: "0px 0px -10% 0px" }
+  );
+
+  observer.observe(section);
+}
+
 setupTabs();
 setupNav();
 setupHeaderScroll();
 setupReveal();
+setupEncontro();
+setupEscuta();
 renderTeam();
