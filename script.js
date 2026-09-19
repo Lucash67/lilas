@@ -67,8 +67,19 @@ const TEAM = {
 };
 
 const PHOTO_VERSION = "7";
-const SECTOR_IDS = Object.keys(TEAM);
-let activeSector = "secretaria";
+const COURSE_ORDER = [
+  "Fonoaudiologia",
+  "Psicologia",
+  "Medicina",
+  "Odontologia",
+  "Educação Física",
+];
+const ROLE_RANK = {
+  Presidente: 0,
+  "Vice-presidente": 1,
+  Coordenadora: 2,
+  Tesouraria: 3,
+};
 
 function escapeHtml(value) {
   return String(value)
@@ -82,89 +93,88 @@ function photoSrc(photo) {
   return `assets/members/${photo}.jpg?v=${PHOTO_VERSION}`;
 }
 
-function memberCard(member, index) {
-  const role = member.role
-    ? `<span class="member-role">${escapeHtml(member.role)}</span>`
+function initialOf(name) {
+  const letter = String(name || "")
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^A-Za-z]/g, "");
+  return (letter.charAt(0) || "L").toUpperCase();
+}
+
+function collectPeople() {
+  const map = new Map();
+
+  Object.values(TEAM).forEach((sector) => {
+    sector.members.forEach((member) => {
+      if (!map.has(member.photo)) {
+        map.set(member.photo, {
+          name: member.name,
+          course: member.course,
+          photo: member.photo,
+          rank: 9,
+          roleLabel: "",
+          sectors: [],
+        });
+      }
+
+      const person = map.get(member.photo);
+      if (!person.sectors.includes(sector.title)) {
+        person.sectors.push(sector.title);
+      }
+
+      if (!member.role) return;
+      const rank = ROLE_RANK[member.role] ?? 8;
+      if (rank >= person.rank) return;
+
+      person.rank = rank;
+      person.roleLabel =
+        member.role === "Coordenadora"
+          ? `Coordenação de ${sector.title}`
+          : member.role;
+    });
+  });
+
+  return COURSE_ORDER.map((course) => ({
+    course,
+    members: [...map.values()]
+      .filter((person) => person.course === course)
+      .sort((a, b) => a.rank - b.rank || a.name.localeCompare(b.name, "pt")),
+  })).filter((group) => group.members.length);
+}
+
+function pessoaCard(person, index) {
+  const role = person.roleLabel
+    ? `<span class="member-role">${escapeHtml(person.roleLabel)}</span>`
     : "";
 
   return `
-    <article class="member-card" style="animation-delay: ${index * 70}ms">
+    <article class="member-card pessoa-card" data-initial="${escapeHtml(initialOf(person.name))}" tabindex="0" style="animation-delay: ${index * 50}ms">
       <div class="member-photo">
-        <img src="${photoSrc(member.photo)}" alt="Foto de ${escapeHtml(member.name)}" loading="lazy" />
+        <img src="${photoSrc(person.photo)}" alt="Foto de ${escapeHtml(person.name)}" loading="lazy" decoding="async" />
       </div>
-      <h3>${escapeHtml(member.name)}</h3>
-      <p class="member-course">${escapeHtml(member.course || "")}</p>
+      <h3>${escapeHtml(person.name)}</h3>
       ${role}
+      <p class="pessoa-setores">${escapeHtml(person.sectors.join(" · "))}</p>
     </article>
   `;
 }
 
-function renderTeam() {
-  const root = document.getElementById("team-sectors");
+function renderPessoas() {
+  const root = document.getElementById("pessoas-list");
   if (!root) return;
 
-  root.innerHTML = Object.entries(TEAM)
-    .map(([id, sector]) => {
-      const active = id === activeSector;
-      return `
-        <div
-          class="sector-block ${active ? "is-active" : ""}"
-          id="sector-${id}"
-          role="tabpanel"
-          aria-labelledby="tab-${id}"
-          ${active ? "" : "hidden"}
-        >
-          <h3 class="sector-title">${escapeHtml(sector.title)}</h3>
+  root.innerHTML = collectPeople()
+    .map(
+      (group) => `
+        <section class="pessoas-course" data-reveal>
+          <h3>${escapeHtml(group.course)}</h3>
           <div class="member-grid">
-            ${sector.members.map((member, index) => memberCard(member, index)).join("")}
+            ${group.members.map((person, index) => pessoaCard(person, index)).join("")}
           </div>
-        </div>
-      `;
-    })
+        </section>
+      `
+    )
     .join("");
-}
-
-function setActiveSector(sectorId) {
-  if (!TEAM[sectorId]) return;
-  activeSector = sectorId;
-
-  document.querySelectorAll(".sector-tab").forEach((tab) => {
-    const on = tab.dataset.sector === sectorId;
-    tab.classList.toggle("is-active", on);
-    tab.setAttribute("aria-selected", on ? "true" : "false");
-    tab.tabIndex = on ? 0 : -1;
-  });
-
-  renderTeam();
-}
-
-function setupTabs() {
-  const tabs = [...document.querySelectorAll(".sector-tab")];
-
-  tabs.forEach((tab) => {
-    tab.addEventListener("click", () => setActiveSector(tab.dataset.sector));
-
-    tab.addEventListener("keydown", (event) => {
-      const index = tabs.indexOf(tab);
-      let next = index;
-
-      if (event.key === "ArrowRight" || event.key === "ArrowDown") {
-        next = (index + 1) % tabs.length;
-      } else if (event.key === "ArrowLeft" || event.key === "ArrowUp") {
-        next = (index - 1 + tabs.length) % tabs.length;
-      } else if (event.key === "Home") {
-        next = 0;
-      } else if (event.key === "End") {
-        next = tabs.length - 1;
-      } else {
-        return;
-      }
-
-      event.preventDefault();
-      tabs[next].focus();
-      setActiveSector(tabs[next].dataset.sector);
-    });
-  });
 }
 
 function setupNav() {
@@ -224,6 +234,53 @@ function setupReveal() {
   nodes.forEach((node) => observer.observe(node));
 }
 
+function bindHandScene(section, hand) {
+  if (!section || !hand) return;
+  if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+
+  const observer = new IntersectionObserver(
+    (entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) hand.resume();
+        else hand.pause();
+      });
+    },
+    { threshold: 0.08, rootMargin: "0px 0px -6% 0px" }
+  );
+
+  observer.observe(section);
+}
+
+function setupNavWatch() {
+  const links = [...document.querySelectorAll('.nav a[href^="#"]')];
+  const pairs = links
+    .map((link) => {
+      const section = document.querySelector(link.hash);
+      return section ? { link, section } : null;
+    })
+    .filter(Boolean);
+
+  if (!pairs.length) return;
+
+  const setHere = (id) => {
+    pairs.forEach(({ link, section }) => {
+      link.classList.toggle("is-here", section.id === id);
+    });
+  };
+
+  const observer = new IntersectionObserver(
+    (entries) => {
+      const visible = entries
+        .filter((entry) => entry.isIntersecting)
+        .sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
+      if (visible && visible.target.id) setHere(visible.target.id);
+    },
+    { rootMargin: "-28% 0px -55% 0px", threshold: [0.18, 0.4, 0.7] }
+  );
+
+  pairs.forEach(({ section }) => observer.observe(section));
+}
+
 function setupEncontro() {
   const el = document.getElementById("lilas-hand");
   if (!el || !window.LilasHand) return;
@@ -274,6 +331,7 @@ function setupEncontro() {
   };
 
   play();
+  bindHandScene(root, hand);
 }
 
 function setupEscuta() {
@@ -329,12 +387,245 @@ function setupEscuta() {
   );
 
   observer.observe(section);
+  bindHandScene(section, hand);
 }
 
-setupTabs();
+function setupGesto() {
+  const el = document.getElementById("gesto-hand");
+  const section = document.getElementById("gesto");
+  if (!el || !section || !window.LilasHand) return;
+
+  const glyphs = [...document.querySelectorAll(".gesto-libras [data-glyph]")];
+  const reveal = (name) => {
+    const node = document.querySelector(`[data-gesto="${name}"]`);
+    if (node) node.classList.add("is-in");
+  };
+
+  const hand = window.LilasHand.mount(el);
+  const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  let played = false;
+
+  const play = async () => {
+    if (played) return;
+    played = true;
+    reveal("whisper");
+    reveal("phrase");
+
+    if (reduced) {
+      glyphs.forEach((glyph) => glyph.classList.add("is-on", "is-done"));
+      reveal("aside");
+      await hand.show("L");
+      hand.idle();
+      return;
+    }
+
+    await hand.spell("LIBRAS", {
+      hold: 320,
+      move: 220,
+      chips: false,
+      onLetter(index) {
+        glyphs.forEach((glyph, i) => {
+          glyph.classList.toggle("is-on", i === index);
+          glyph.classList.toggle("is-done", i <= index);
+        });
+      },
+    });
+
+    reveal("aside");
+    await hand.show("L");
+    hand.idle();
+  };
+
+  if (reduced) {
+    play();
+    return;
+  }
+
+  const observer = new IntersectionObserver(
+    (entries) => {
+      entries.forEach((entry) => {
+        if (!entry.isIntersecting) return;
+        play();
+        observer.disconnect();
+      });
+    },
+    { threshold: 0.28, rootMargin: "0px 0px -10% 0px" }
+  );
+
+  observer.observe(section);
+  bindHandScene(section, hand);
+}
+
+function setupCaminhos() {
+  const el = document.getElementById("caminhos-hand");
+  const section = document.getElementById("caminhos");
+  if (!el || !section || !window.LilasHand) return;
+
+  const reveal = (name) => {
+    const node = document.querySelector(`[data-caminhos="${name}"]`);
+    if (node) node.classList.add("is-in");
+  };
+
+  const hand = window.LilasHand.mount(el);
+  const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  let played = false;
+
+  const play = async () => {
+    if (played) return;
+    played = true;
+    reveal("whisper");
+    reveal("hook");
+    await hand.show("L");
+    hand.idle();
+  };
+
+  if (reduced) {
+    play();
+    return;
+  }
+
+  const observer = new IntersectionObserver(
+    (entries) => {
+      entries.forEach((entry) => {
+        if (!entry.isIntersecting) return;
+        play();
+        observer.disconnect();
+      });
+    },
+    { threshold: 0.24, rootMargin: "0px 0px -10% 0px" }
+  );
+
+  observer.observe(section);
+  bindHandScene(section, hand);
+}
+
+function setupPessoas() {
+  const el = document.getElementById("pessoas-hand");
+  const section = document.getElementById("pessoas");
+  if (!el || !section || !window.LilasHand) return;
+
+  const reveal = (name) => {
+    const node = document.querySelector(`[data-pessoas="${name}"]`);
+    if (node) node.classList.add("is-in");
+  };
+
+  const hand = window.LilasHand.mount(el);
+  const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  let played = false;
+  let leaveTimer = 0;
+
+  const play = async () => {
+    if (played) return;
+    played = true;
+    reveal("whisper");
+    reveal("hook");
+    await hand.show("L");
+    hand.idle();
+  };
+
+  if (!reduced) {
+    section.addEventListener("pointerover", (event) => {
+      const card = event.target.closest("[data-initial]");
+      if (!card || !section.contains(card)) return;
+      window.clearTimeout(leaveTimer);
+      hand.show(card.dataset.initial);
+    });
+
+    section.addEventListener("pointerout", (event) => {
+      const card = event.target.closest("[data-initial]");
+      if (!card) return;
+      const next = event.relatedTarget && event.relatedTarget.closest
+        ? event.relatedTarget.closest("[data-initial]")
+        : null;
+      if (next && section.contains(next)) return;
+      leaveTimer = window.setTimeout(() => {
+        hand.show("L").then(() => hand.idle());
+      }, 220);
+    });
+
+    section.addEventListener("focusin", (event) => {
+      const card = event.target.closest("[data-initial]");
+      if (!card) return;
+      window.clearTimeout(leaveTimer);
+      hand.show(card.dataset.initial);
+    });
+
+    section.addEventListener("focusout", (event) => {
+      const next = event.relatedTarget && event.relatedTarget.closest
+        ? event.relatedTarget.closest("[data-initial]")
+        : null;
+      if (next && section.contains(next)) return;
+      leaveTimer = window.setTimeout(() => {
+        hand.show("L").then(() => hand.idle());
+      }, 220);
+    });
+  }
+
+  if (reduced) {
+    play();
+    return;
+  }
+
+  const observer = new IntersectionObserver(
+    (entries) => {
+      entries.forEach((entry) => {
+        if (!entry.isIntersecting) return;
+        play();
+        observer.disconnect();
+      });
+    },
+    { threshold: 0.18, rootMargin: "0px 0px -8% 0px" }
+  );
+
+  observer.observe(section);
+  bindHandScene(section, hand);
+}
+
+function setupTempo() {
+  const section = document.getElementById("tempo");
+  if (!section) return;
+
+  const reveal = (name) => {
+    const node = document.querySelector(`[data-tempo="${name}"]`);
+    if (node) node.classList.add("is-in");
+  };
+
+  const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const play = () => {
+    reveal("whisper");
+    reveal("year");
+    window.setTimeout(() => reveal("line"), reduced ? 0 : 140);
+    window.setTimeout(() => reveal("seal"), reduced ? 0 : 280);
+    window.setTimeout(() => reveal("meta"), reduced ? 0 : 400);
+  };
+
+  if (reduced) {
+    play();
+    return;
+  }
+
+  const observer = new IntersectionObserver(
+    (entries) => {
+      entries.forEach((entry) => {
+        if (!entry.isIntersecting) return;
+        play();
+        observer.disconnect();
+      });
+    },
+    { threshold: 0.35 }
+  );
+
+  observer.observe(section);
+}
+
 setupNav();
+setupNavWatch();
 setupHeaderScroll();
+renderPessoas();
 setupReveal();
 setupEncontro();
 setupEscuta();
-renderTeam();
+setupGesto();
+setupCaminhos();
+setupPessoas();
+setupTempo();

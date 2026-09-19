@@ -405,19 +405,32 @@
       raf = requestAnimationFrame(tickIdle);
     }
 
+    let visible = true;
+
     function idle() {
-      idleOn = !reduced;
+      idleOn = !reduced && visible;
       cancelAnimationFrame(raf);
       if (reduced) {
         paint(mergePose(letter || "L"));
         return;
       }
+      if (!visible) return;
       raf = requestAnimationFrame(tickIdle);
     }
 
     function stopIdle() {
       idleOn = false;
       cancelAnimationFrame(raf);
+    }
+
+    function pause() {
+      visible = false;
+      stopIdle();
+    }
+
+    function resume() {
+      visible = true;
+      if (letter) idle();
     }
 
     function transitionTo(nextLetter, duration) {
@@ -550,6 +563,8 @@
       show,
       spell,
       idle,
+      pause,
+      resume,
       prepareChips,
       destroy,
       get letter() {
