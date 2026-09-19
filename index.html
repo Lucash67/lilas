@@ -161,6 +161,16 @@
           <p class="eyebrow">Integrantes</p>
           <h2>Conheça o Time LILAS 2026.2</h2>
           <p class="section-lead">Estudantes de várias áreas, unidos pela Libras, pela inclusão e pelo cuidado em saúde.</p>
+          <div class="edit-controls">
+            <button class="btn btn-secondary" type="button" id="edit-toggle" aria-pressed="false">Editar time</button>
+          </div>
+          <div class="edit-bar" id="edit-bar" hidden>
+            <p>Clique na foto para trocar · edite nome, curso e cargo nos campos · alterações ficam salvas neste navegador.</p>
+            <div class="edit-bar-actions">
+              <button class="btn btn-secondary" type="button" id="edit-export">Baixar dados</button>
+              <button class="btn btn-secondary" type="button" id="edit-reset">Restaurar original</button>
+            </div>
+          </div>
         </div>
 
         <div class="sector-tabs" role="tablist" aria-label="Setores do time">
@@ -203,6 +213,20 @@
       <p class="footer-meta">CCS · UNIFOR · Time 2026.2</p>
     </div>
   </footer>
+
+  <div class="photo-picker" id="photo-picker" hidden>
+    <div class="photo-picker-panel" role="dialog" aria-modal="true" aria-labelledby="photo-picker-title">
+      <div class="photo-picker-head">
+        <h3 id="photo-picker-title">Escolher foto</h3>
+        <button type="button" class="photo-picker-close" id="photo-picker-close" aria-label="Fechar">×</button>
+      </div>
+      <label class="photo-upload-label btn btn-secondary">
+        Enviar nova foto
+        <input type="file" id="photo-upload" accept="image/*" hidden />
+      </label>
+      <div class="photo-picker-grid" id="photo-picker-grid"></div>
+    </div>
+  </div>
 
   <script src="script.js"></script>
 </body>
