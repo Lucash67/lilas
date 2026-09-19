@@ -6,6 +6,13 @@ const TEAM = {
       { name: "Isadora Ribeiro", course: "Fonoaudiologia", role: "Vice-presidente", photo: "isadora-ribeiro" },
     ],
   },
+  tesouraria: {
+    title: "Tesouraria",
+    members: [
+      { name: "Andressa Maria", course: "Psicologia", photo: "andressa-maria" },
+      { name: "Marina Freire", course: "Medicina", photo: "marina-freire" },
+    ],
+  },
   marketing: {
     title: "Marketing",
     members: [
