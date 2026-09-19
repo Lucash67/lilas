@@ -130,10 +130,12 @@ function saveAll() {
   localStorage.setItem(STORAGE_PHOTOS, JSON.stringify(customPhotos));
 }
 
+const PHOTO_VERSION = "3";
+
 function photoSrc(photo) {
   if (customPhotos[photo]) return customPhotos[photo];
   if (String(photo).startsWith("data:")) return photo;
-  return `assets/members/${photo}.jpg`;
+  return `assets/members/${photo}.jpg?v=${PHOTO_VERSION}`;
 }
 
 function memberCard(member, sectorId, index) {
