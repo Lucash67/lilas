@@ -7,3 +7,8 @@ node_modules/
 .vscode/
 
 .vercel
+
+assets/brand/_*
+assets/brand/team-hero-rembg.png
+assets/brand/team-hero-matte.png
+assets/brand/team-cover-band.jpg

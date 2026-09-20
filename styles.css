@@ -441,22 +441,24 @@ body.nav-lock {
   width: min(56vw, 680px);
   opacity: calc(1 - var(--open) * 1.15);
   clip-path: inset(calc(var(--open) * 38%) 0 0 0);
-  filter: drop-shadow(0 28px 36px rgba(23, 13, 23, 0.16));
   transform: translate3d(calc(var(--mx) * 6px), calc(var(--my) * 5px), 0);
 }
 
 .hero-photo-in {
-  clip-path: inset(14% 8% 10% 8%);
-  transform: scale(1.08);
+  overflow: hidden;
+  border-radius: 1.35rem;
+  background: var(--lilas-100);
+  box-shadow:
+    0 24px 48px rgba(79, 29, 79, 0.12),
+    inset 0 0 0 1px rgba(113, 38, 111, 0.08);
+  transform: scale(1.04);
   opacity: 0;
   transition:
-    clip-path 1.05s 0.48s cubic-bezier(0.22, 1, 0.36, 1),
     transform 1.05s 0.48s cubic-bezier(0.22, 1, 0.36, 1),
-    opacity 0.2s 0.48s linear;
+    opacity 0.35s 0.48s ease;
 }
 
 .hero.is-ready .hero-photo-in {
-  clip-path: inset(0);
   transform: scale(1);
   opacity: 1;
 }
@@ -465,6 +467,7 @@ body.nav-lock {
   width: 100%;
   height: auto;
   display: block;
+  border-radius: 1.35rem;
 }
 
 .hero-line {
@@ -856,7 +859,10 @@ body.nav-lock {
   width: 100%;
   height: auto;
   border-radius: 1.6rem;
-  filter: drop-shadow(0 22px 36px rgba(156, 38, 151, 0.14));
+  background: var(--lilas-100);
+  box-shadow:
+    0 24px 48px rgba(79, 29, 79, 0.1),
+    inset 0 0 0 1px rgba(113, 38, 111, 0.08);
 }
 
 .escuta-witness figcaption {
