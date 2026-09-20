@@ -81,6 +81,24 @@ const ROLE_RANK = {
   Tesouraria: 3,
 };
 
+const scrollTasks = [];
+let scrollFrame = 0;
+
+function registerScrollTask(task) {
+  scrollTasks.push(task);
+  task();
+}
+
+function scheduleScrollTasks() {
+  if (scrollFrame) return;
+  scrollFrame = window.requestAnimationFrame(() => {
+    scrollFrame = 0;
+    scrollTasks.forEach((task) => task());
+  });
+}
+
+window.addEventListener("scroll", scheduleScrollTasks, { passive: true });
+
 function escapeHtml(value) {
   return String(value)
     .replace(/&/g, "&amp;")
@@ -91,14 +109,6 @@ function escapeHtml(value) {
 
 function photoSrc(photo) {
   return `assets/members/${photo}.jpg?v=${PHOTO_VERSION}`;
-}
-
-function initialOf(name) {
-  const letter = String(name || "")
-    .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "")
-    .replace(/[^A-Za-z]/g, "");
-  return (letter.charAt(0) || "L").toUpperCase();
 }
 
 function collectPeople() {
@@ -142,15 +152,15 @@ function collectPeople() {
   })).filter((group) => group.members.length);
 }
 
-function pessoaCard(person, index) {
+function pessoaCard(person) {
   const role = person.roleLabel
     ? `<span class="member-role">${escapeHtml(person.roleLabel)}</span>`
     : "";
 
   return `
-    <article class="member-card pessoa-card" data-initial="${escapeHtml(initialOf(person.name))}" tabindex="0" style="animation-delay: ${index * 50}ms">
+    <article class="member-card pessoa-card" tabindex="0">
       <div class="member-photo">
-        <img src="${photoSrc(person.photo)}" alt="Foto de ${escapeHtml(person.name)}" loading="lazy" decoding="async" />
+        <img src="${photoSrc(person.photo)}" alt="Foto de ${escapeHtml(person.name)}" width="118" height="118" loading="lazy" decoding="async" />
       </div>
       <h3>${escapeHtml(person.name)}</h3>
       ${role}
@@ -169,7 +179,7 @@ function renderPessoas() {
         <section class="pessoas-course" data-reveal>
           <h3>${escapeHtml(group.course)}</h3>
           <div class="member-grid">
-            ${group.members.map((person, index) => pessoaCard(person, index)).join("")}
+            ${group.members.map((person) => pessoaCard(person)).join("")}
           </div>
         </section>
       `
@@ -239,8 +249,7 @@ function setupHeaderScroll() {
     header.classList.toggle("is-on-dark", top < 96 && nextTop > 64);
   };
 
-  onScroll();
-  window.addEventListener("scroll", onScroll, { passive: true });
+  registerScrollTask(onScroll);
 }
 
 function setupReveal() {
@@ -266,18 +275,32 @@ function setupReveal() {
   nodes.forEach((node) => observer.observe(node));
 }
 
-function bindHandScene(section, hand) {
-  if (!section || !hand) return;
-  if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+function runWhenSectionVisible(section, play, options = {}) {
+  if (!section) return;
+  const { threshold = 0.28, rootMargin = "0px 0px -10% 0px" } = options;
+  const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  let done = false;
+
+  const run = () => {
+    if (done) return;
+    done = true;
+    play();
+  };
+
+  if (reduced) {
+    run();
+    return;
+  }
 
   const observer = new IntersectionObserver(
     (entries) => {
       entries.forEach((entry) => {
-        if (entry.isIntersecting) hand.resume();
-        else hand.pause();
+        if (!entry.isIntersecting) return;
+        run();
+        observer.disconnect();
       });
     },
-    { threshold: 0.08, rootMargin: "0px 0px -6% 0px" }
+    { threshold, rootMargin }
   );
 
   observer.observe(section);
@@ -345,11 +368,19 @@ function setupHero() {
   };
 
   if (window.matchMedia("(pointer: fine)").matches) {
+    let heroActive = true;
+    const heroVisibility = new IntersectionObserver(
+      ([entry]) => {
+        heroActive = entry.isIntersecting;
+      },
+      { rootMargin: "10% 0px 10% 0px", threshold: 0 }
+    );
+    heroVisibility.observe(hero);
+
     window.addEventListener(
       "pointermove",
       (event) => {
-        const rect = hero.getBoundingClientRect();
-        if (rect.bottom < 0 || rect.top > window.innerHeight) return;
+        if (!heroActive) return;
         tx = ((event.clientX / window.innerWidth) - 0.5) * 2;
         ty = ((event.clientY / window.innerHeight) - 0.5) * 2;
         if (!ticking) ticking = window.requestAnimationFrame(tick);
@@ -360,12 +391,12 @@ function setupHero() {
 
   const onScroll = () => {
     const rect = hero.getBoundingClientRect();
+    if (rect.bottom < 0 || rect.top > window.innerHeight * 1.15) return;
     const span = Math.max(rect.height * 0.7, 1);
     setOpen(-rect.top / span);
   };
 
-  onScroll();
-  window.addEventListener("scroll", onScroll, { passive: true });
+  registerScrollTask(onScroll);
 }
 
 function setupManifesto() {
@@ -373,274 +404,107 @@ function setupManifesto() {
   if (!section) return;
 
   const lines = [...section.querySelectorAll("[data-manifesto]")];
+  const pillars = [...section.querySelectorAll(".manifesto-pillars [data-manifesto]")];
   const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const compact = () => window.matchMedia("(max-width: 720px)").matches;
 
   if (reduced) {
     lines.forEach((line) => line.classList.add("is-in"));
     return;
   }
 
+  if (compact() && pillars.length) {
+    const pillarObserver = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (!entry.isIntersecting) return;
+          entry.target.classList.add("is-in");
+          pillarObserver.unobserve(entry.target);
+        });
+      },
+      { threshold: 0.12, rootMargin: "0px 0px 8% 0px" }
+    );
+    pillars.forEach((pillar) => pillarObserver.observe(pillar));
+  }
+
   const onScroll = () => {
     const rect = section.getBoundingClientRect();
     const view = window.innerHeight;
-    const progress = Math.max(0, Math.min(1, (view * 0.78 - rect.top) / Math.max(rect.height * 0.55, 1)));
+    if (rect.bottom < -view * 0.15 || rect.top > view * 1.15) return;
+
+    const isCompact = compact();
+    const heightScale = isCompact ? 0.92 : 0.55;
+    const progress = Math.max(
+      0,
+      Math.min(1, (view * (isCompact ? 0.65 : 0.78) - rect.top) / Math.max(rect.height * heightScale, 1))
+    );
     section.style.setProperty("--reveal", progress.toFixed(4));
 
     lines.forEach((line) => {
-      const at = Number(line.getAttribute("data-manifesto")) * 0.16;
+      const step = Number(line.getAttribute("data-manifesto"));
+      if (isCompact && step >= 5 && step <= 7) return;
+
+      const stepScale = isCompact ? 0.085 : 0.11;
+      const at = step === 0 ? 0.04 : step * stepScale;
       line.classList.toggle("is-in", progress > at);
     });
+
+    if (isCompact && progress > 0.42) {
+      pillars.forEach((pillar) => pillar.classList.add("is-in"));
+    }
   };
 
-  onScroll();
-  window.addEventListener("scroll", onScroll, { passive: true });
+  registerScrollTask(onScroll);
 }
 
 function setupEscuta() {
-  const el = document.getElementById("escuta-hand");
   const section = document.getElementById("escuta");
-  if (!el || !section || !window.LilasHand) return;
-
-  const reveal = (name) => {
-    const node = document.querySelector(`[data-escuta="${name}"]`);
-    if (node) node.classList.add("is-in");
-  };
-
-  const hand = window.LilasHand.mount(el);
-  const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-  let played = false;
-
-  const play = async () => {
-    if (played) return;
-    played = true;
-    reveal("whisper");
-    reveal("year");
-    reveal("hook");
-
-    if (reduced) {
-      await hand.show("L");
-      hand.idle();
-      return;
-    }
-
-    await hand.spell("LIGA", {
-      hold: 340,
-      move: 240,
-      chips: false,
+  runWhenSectionVisible(section, () => {
+    ["whisper", "year", "hook"].forEach((name) => {
+      document.querySelector(`[data-escuta="${name}"]`)?.classList.add("is-in");
     });
-    await hand.show("L");
-    hand.idle();
-  };
-
-  if (reduced) {
-    play();
-    return;
-  }
-
-  const observer = new IntersectionObserver(
-    (entries) => {
-      entries.forEach((entry) => {
-        if (!entry.isIntersecting) return;
-        play();
-        observer.disconnect();
-      });
-    },
-    { threshold: 0.28, rootMargin: "0px 0px -10% 0px" }
-  );
-
-  observer.observe(section);
-  bindHandScene(section, hand);
+  });
 }
 
 function setupGesto() {
-  const el = document.getElementById("gesto-hand");
   const section = document.getElementById("gesto");
-  if (!el || !section || !window.LilasHand) return;
-
   const glyphs = [...document.querySelectorAll(".gesto-libras [data-glyph]")];
-  const reveal = (name) => {
-    const node = document.querySelector(`[data-gesto="${name}"]`);
-    if (node) node.classList.add("is-in");
-  };
-
-  const hand = window.LilasHand.mount(el);
-  const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-  let played = false;
-
-  const play = async () => {
-    if (played) return;
-    played = true;
-    reveal("whisper");
-    reveal("phrase");
-
-    if (reduced) {
-      glyphs.forEach((glyph) => glyph.classList.add("is-on", "is-done"));
-      reveal("aside");
-      await hand.show("L");
-      hand.idle();
-      return;
-    }
-
-    await hand.spell("LIBRAS", {
-      hold: 320,
-      move: 220,
-      chips: false,
-      onLetter(index) {
-        glyphs.forEach((glyph, i) => {
-          glyph.classList.toggle("is-on", i === index);
-          glyph.classList.toggle("is-done", i <= index);
-        });
-      },
+  runWhenSectionVisible(section, () => {
+    ["whisper", "hook", "phrase"].forEach((name) => {
+      document.querySelector(`[data-gesto="${name}"]`)?.classList.add("is-in");
     });
-
-    reveal("aside");
-    await hand.show("L");
-    hand.idle();
-  };
-
-  if (reduced) {
-    play();
-    return;
-  }
-
-  const observer = new IntersectionObserver(
-    (entries) => {
-      entries.forEach((entry) => {
-        if (!entry.isIntersecting) return;
-        play();
-        observer.disconnect();
-      });
-    },
-    { threshold: 0.28, rootMargin: "0px 0px -10% 0px" }
-  );
-
-  observer.observe(section);
-  bindHandScene(section, hand);
+    glyphs.forEach((glyph) => glyph.classList.add("is-done"));
+    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    window.setTimeout(() => {
+      document.querySelector('[data-gesto="aside"]')?.classList.add("is-in");
+    }, reduced ? 0 : 180);
+  });
 }
 
 function setupCaminhos() {
-  const el = document.getElementById("caminhos-hand");
   const section = document.getElementById("caminhos");
-  if (!el || !section || !window.LilasHand) return;
-
-  const reveal = (name) => {
-    const node = document.querySelector(`[data-caminhos="${name}"]`);
-    if (node) node.classList.add("is-in");
-  };
-
-  const hand = window.LilasHand.mount(el);
-  const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-  let played = false;
-
-  const play = async () => {
-    if (played) return;
-    played = true;
-    reveal("whisper");
-    reveal("hook");
-    await hand.show("L");
-    hand.idle();
-  };
-
-  if (reduced) {
-    play();
-    return;
-  }
-
-  const observer = new IntersectionObserver(
-    (entries) => {
-      entries.forEach((entry) => {
-        if (!entry.isIntersecting) return;
-        play();
-        observer.disconnect();
+  runWhenSectionVisible(
+    section,
+    () => {
+      ["whisper", "hook"].forEach((name) => {
+        document.querySelector(`[data-caminhos="${name}"]`)?.classList.add("is-in");
       });
     },
-    { threshold: 0.24, rootMargin: "0px 0px -10% 0px" }
+    { threshold: 0.24 }
   );
-
-  observer.observe(section);
-  bindHandScene(section, hand);
 }
 
 function setupPessoas() {
-  const el = document.getElementById("pessoas-hand");
   const section = document.getElementById("pessoas");
-  if (!el || !section || !window.LilasHand) return;
-
-  const reveal = (name) => {
-    const node = document.querySelector(`[data-pessoas="${name}"]`);
-    if (node) node.classList.add("is-in");
-  };
-
-  const hand = window.LilasHand.mount(el);
-  const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-  let played = false;
-  let leaveTimer = 0;
-
-  const play = async () => {
-    if (played) return;
-    played = true;
-    reveal("whisper");
-    reveal("hook");
-    await hand.show("L");
-    hand.idle();
-  };
-
-  if (!reduced) {
-    section.addEventListener("pointerover", (event) => {
-      const card = event.target.closest("[data-initial]");
-      if (!card || !section.contains(card)) return;
-      window.clearTimeout(leaveTimer);
-      hand.show(card.dataset.initial);
-    });
-
-    section.addEventListener("pointerout", (event) => {
-      const card = event.target.closest("[data-initial]");
-      if (!card) return;
-      const next = event.relatedTarget && event.relatedTarget.closest
-        ? event.relatedTarget.closest("[data-initial]")
-        : null;
-      if (next && section.contains(next)) return;
-      leaveTimer = window.setTimeout(() => {
-        hand.show("L").then(() => hand.idle());
-      }, 220);
-    });
-
-    section.addEventListener("focusin", (event) => {
-      const card = event.target.closest("[data-initial]");
-      if (!card) return;
-      window.clearTimeout(leaveTimer);
-      hand.show(card.dataset.initial);
-    });
-
-    section.addEventListener("focusout", (event) => {
-      const next = event.relatedTarget && event.relatedTarget.closest
-        ? event.relatedTarget.closest("[data-initial]")
-        : null;
-      if (next && section.contains(next)) return;
-      leaveTimer = window.setTimeout(() => {
-        hand.show("L").then(() => hand.idle());
-      }, 220);
-    });
-  }
-
-  if (reduced) {
-    play();
-    return;
-  }
-
-  const observer = new IntersectionObserver(
-    (entries) => {
-      entries.forEach((entry) => {
-        if (!entry.isIntersecting) return;
-        play();
-        observer.disconnect();
+  runWhenSectionVisible(
+    section,
+    () => {
+      ["whisper", "hook"].forEach((name) => {
+        document.querySelector(`[data-pessoas="${name}"]`)?.classList.add("is-in");
       });
     },
     { threshold: 0.18, rootMargin: "0px 0px -8% 0px" }
   );
-
-  observer.observe(section);
-  bindHandScene(section, hand);
 }
 
 function setupTempo() {
@@ -680,15 +544,23 @@ function setupTempo() {
   observer.observe(section);
 }
 
-setupNav();
-setupNavWatch();
-setupHeaderScroll();
-renderPessoas();
-setupReveal();
-setupHero();
-setupManifesto();
-setupEscuta();
-setupGesto();
-setupCaminhos();
-setupPessoas();
-setupTempo();
+function boot() {
+  setupNav();
+  setupNavWatch();
+  setupHeaderScroll();
+  renderPessoas();
+  setupReveal();
+  setupHero();
+  setupManifesto();
+  setupEscuta();
+  setupGesto();
+  setupCaminhos();
+  setupPessoas();
+  setupTempo();
+}
+
+if (document.readyState === "loading") {
+  document.addEventListener("DOMContentLoaded", boot);
+} else {
+  boot();
+}

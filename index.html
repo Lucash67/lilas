@@ -10,10 +10,13 @@
   <meta property="og:type" content="website" />
   <meta property="og:image" content="assets/brand/logo.png" />
   <link rel="icon" href="assets/brand/logo.png" type="image/png" />
-  <link rel="preload" as="image" href="assets/brand/team-hero-flat.jpg?v=photo10" />
+  <link rel="preload" as="image" type="image/webp" href="assets/brand/team-hero.webp?v=perf1" fetchpriority="high" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,500;1,9..144,600&family=Outfit:wght@400;500;600&family=Fredoka:wght@500;600;700&family=Nunito:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet" />
+  <link
+    rel="stylesheet"
+    href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Outfit:wght@400;500;600&family=Fredoka:wght@500;600&family=Nunito:wght@400;600;700&display=swap"
+  />
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
@@ -66,14 +69,22 @@
           <h1 class="hero-name" id="hero-name">LILAS</h1>
           <figure class="hero-photo">
             <div class="hero-photo-in">
-              <img
-                src="assets/brand/team-hero-flat.jpg?v=photo10"
-                alt="Time 2026.2 da LILAS, integrantes com as camisas da liga"
-                width="1280"
-                height="691"
-                fetchpriority="high"
-                decoding="async"
-              />
+              <picture>
+                <source
+                  type="image/webp"
+                  srcset="assets/brand/team-hero.webp?v=perf1"
+                  sizes="(max-width: 720px) 88vw, 420px"
+                />
+                <img
+                  src="assets/brand/team-hero.png?v=photo11"
+                  alt="Time 2026.2 da LILAS, integrantes com as camisas da liga"
+                  width="1280"
+                  height="686"
+                  sizes="(max-width: 720px) 88vw, 420px"
+                  fetchpriority="high"
+                  decoding="async"
+                />
+              </picture>
             </div>
           </figure>
         </div>
@@ -106,6 +117,14 @@
     </section>
 
     <section class="manifesto" id="manifesto" aria-labelledby="manifesto-title">
+      <div class="manifesto-bg" aria-hidden="true">
+        <span class="manifesto-orb manifesto-orb-a"></span>
+        <span class="manifesto-orb manifesto-orb-b"></span>
+        <span class="manifesto-ring manifesto-ring-a"></span>
+        <span class="manifesto-ring manifesto-ring-b"></span>
+        <img class="manifesto-mark" src="assets/brand/logo.png" alt="" width="320" height="320" loading="lazy" decoding="async" />
+      </div>
+
       <div class="manifesto-flow" aria-hidden="true">
         <svg viewBox="0 0 1440 420" preserveAspectRatio="none">
           <path pathLength="1" d="M-40 80 C 220 20, 360 220, 620 160 S 980 40, 1180 180 S 1360 320, 1500 240" />
@@ -113,36 +132,55 @@
       </div>
 
       <div class="manifesto-frame">
+        <p class="manifesto-kicker" data-manifesto="0">Liga de Libras · CCS · UNIFOR</p>
+
         <h2 class="manifesto-title" id="manifesto-title">
           <span data-manifesto="1">Escutar</span>
           <span data-manifesto="2">também é</span>
           <span data-manifesto="3">Ver.</span>
         </h2>
+
         <p class="manifesto-after" data-manifesto="4">
-          Cuidar também é construir caminhos para que a comunicação aconteça.
+          Cuidar também é construir caminhos para que a comunicação aconteça — em Libras, no consultório e na comunidade surda.
         </p>
+
+        <ul class="manifesto-pillars" aria-label="Eixos da liga">
+          <li data-manifesto="5">
+            <span class="manifesto-pillar-n">01</span>
+            <strong>Ensino</strong>
+            <p>Atividades educativas, trocas de conhecimento e aprendizagem voltadas à Libras, à inclusão e à saúde da pessoa surda.</p>
+          </li>
+          <li data-manifesto="6">
+            <span class="manifesto-pillar-n">02</span>
+            <strong>Pesquisa</strong>
+            <p>Produção científica e reflexão sobre acessibilidade, Libras e atenção à saúde da comunidade surda.</p>
+          </li>
+          <li data-manifesto="7">
+            <span class="manifesto-pillar-n">03</span>
+            <strong>Extensão</strong>
+            <p>Ações que conectam universidade e comunidade, com acolhimento, conscientização e práticas inclusivas.</p>
+          </li>
+        </ul>
+
+        <div class="manifesto-foot" data-manifesto="8">
+          <p class="manifesto-since">Desde <time datetime="2020-02">2020</time> · liga acadêmica</p>
+          <a class="manifesto-next" href="#escuta">
+            <span>A escuta</span>
+            <span aria-hidden="true">↓</span>
+          </a>
+        </div>
       </div>
     </section>
 
-    <section class="escuta" id="escuta">
-      <div class="container escuta-frame">
-        <header class="escuta-open">
-          <p class="escuta-whisper" data-escuta="whisper">A escuta</p>
-
-          <div class="escuta-mark">
-            <div
-              class="hand-stage escuta-hand"
-              id="escuta-hand"
-              role="img"
-              aria-label="Mão em datilologia da Libras soletrando LIGA"
-            ></div>
-            <p class="escuta-year" data-escuta="year">2020</p>
-          </div>
-
-          <h2 class="escuta-hook" data-escuta="hook">Não sabíamos cuidar.</h2>
+    <section class="escuta lp-section" id="escuta">
+      <div class="container lp-shell">
+        <header class="lp-head escuta-open">
+          <p class="lp-kicker escuta-whisper" data-escuta="whisper">A escuta</p>
+          <p class="lp-display lp-display--year escuta-year" data-escuta="year">2020</p>
+          <h2 class="lp-display lp-display--hook escuta-hook" data-escuta="hook">Não sabíamos cuidar.</h2>
         </header>
 
-        <div class="escuta-story">
+        <div class="lp-prose escuta-story">
           <p data-reveal>
             Em fevereiro daquele ano, estudantes do CCS da UNIFOR não se sentiam preparados para oferecer um cuidado acessível à pessoa surda. A inquietação veio antes do nome.
           </p>
@@ -160,24 +198,52 @@
         </div>
 
         <figure class="escuta-witness" data-reveal>
-          <img src="assets/brand/team-hero-flat.jpg?v=photo10" alt="Integrantes da LILAS com as camisas lilás da liga" width="1280" height="691" loading="lazy" decoding="async" />
-          <figcaption>O time que carrega essa origem — testemunho, não capa.</figcaption>
+          <a class="escuta-mosaic" href="#pessoas" aria-label="Conhecer o time 2026.2 na seção As pessoas">
+            <span class="escuta-mosaic-cell escuta-mosaic-cell--a">
+              <img src="assets/members/lara-dantas.jpg?v=7" alt="" width="320" height="320" loading="lazy" decoding="async" />
+            </span>
+            <span class="escuta-mosaic-cell escuta-mosaic-cell--b">
+              <img src="assets/members/isadora-ribeiro.jpg?v=7" alt="" width="320" height="320" loading="lazy" decoding="async" />
+            </span>
+            <span class="escuta-mosaic-cell escuta-mosaic-cell--c">
+              <img src="assets/members/andressa-maria.jpg?v=7" alt="" width="320" height="320" loading="lazy" decoding="async" />
+            </span>
+            <span class="escuta-mosaic-cell escuta-mosaic-cell--d">
+              <img src="assets/members/domingos-teixeira.jpg?v=7" alt="" width="320" height="320" loading="lazy" decoding="async" />
+            </span>
+            <span class="escuta-mosaic-core" aria-hidden="true">
+              <img src="assets/brand/logo.png" alt="" width="120" height="120" loading="lazy" decoding="async" />
+              <span class="escuta-mosaic-tag">Time 2026.2</span>
+            </span>
+            <span class="escuta-mosaic-cell escuta-mosaic-cell--e">
+              <img src="assets/members/anna-schevchenco.jpg?v=7" alt="" width="320" height="320" loading="lazy" decoding="async" />
+            </span>
+            <span class="escuta-mosaic-cell escuta-mosaic-cell--f">
+              <img src="assets/members/dora-feijoo.jpg?v=7" alt="" width="320" height="320" loading="lazy" decoding="async" />
+            </span>
+            <span class="escuta-mosaic-cell escuta-mosaic-cell--g">
+              <img src="assets/members/clarisbella-lima.jpg?v=7" alt="" width="320" height="320" loading="lazy" decoding="async" />
+            </span>
+            <span class="escuta-mosaic-cell escuta-mosaic-cell--h">
+              <img src="assets/members/dante-luca.jpg?v=7" alt="" width="320" height="320" loading="lazy" decoding="async" />
+            </span>
+            <span class="escuta-mosaic-more" aria-hidden="true">+ integrantes</span>
+          </a>
+          <figcaption>
+            Rostos que carregam essa origem — <a href="#pessoas">testemunho, não capa</a>.
+          </figcaption>
         </figure>
       </div>
     </section>
 
-    <section class="gesto" id="gesto">
-      <div class="container gesto-frame">
-        <h2 class="gesto-whisper" data-gesto="whisper">O gesto</h2>
+    <section class="gesto lp-section lp-section--soft" id="gesto">
+      <div class="container lp-shell">
+        <header class="lp-head">
+          <p class="lp-kicker gesto-whisper" data-gesto="whisper">O gesto</p>
+          <p class="lp-display lp-display--hook gesto-hook" data-gesto="hook">Propósito da liga</p>
+        </header>
 
         <div class="gesto-scene">
-          <div
-            class="hand-stage gesto-hand"
-            id="gesto-hand"
-            role="img"
-            aria-label="Mão em datilologia da Libras soletrando LIBRAS"
-          ></div>
-
           <p class="gesto-phrase" data-gesto="phrase">
             Promover conhecimento sobre
             <span class="gesto-libras" aria-label="Libras"><span data-glyph="0">L</span><span data-glyph="1">I</span><span data-glyph="2">B</span><span data-glyph="3">R</span><span data-glyph="4">A</span><span data-glyph="5">S</span></span>
@@ -191,22 +257,14 @@
       </div>
     </section>
 
-    <section class="caminhos" id="caminhos">
-      <div class="container caminhos-frame">
-        <header class="caminhos-open">
-          <h2 class="caminhos-whisper" data-caminhos="whisper">Os caminhos</h2>
-          <div class="caminhos-mark">
-            <div
-              class="hand-stage caminhos-hand"
-              id="caminhos-hand"
-              role="img"
-              aria-label="Mão em L da datilologia da Libras, marca da liga"
-            ></div>
-            <p class="caminhos-hook" data-caminhos="hook">Três percursos. Uma liga.</p>
-          </div>
+    <section class="caminhos lp-section lp-section--paper" id="caminhos">
+      <div class="container lp-shell">
+        <header class="lp-head caminhos-open">
+          <p class="lp-kicker caminhos-whisper" data-caminhos="whisper">Os caminhos</p>
+          <h2 class="lp-display lp-display--hook caminhos-hook" data-caminhos="hook">Três percursos. Uma liga.</h2>
         </header>
 
-        <ol class="caminhos-path">
+        <ol class="caminhos-path caminhos-cards">
           <li data-reveal>
             <p class="caminhos-step" aria-hidden="true">01</p>
             <div>
@@ -230,8 +288,8 @@
           </li>
         </ol>
 
-        <div class="caminhos-hold" data-reveal>
-          <p class="caminhos-hold-label">O que sustenta</p>
+        <div class="caminhos-hold lp-panel" data-reveal>
+          <p class="lp-kicker caminhos-hold-label">O que sustenta</p>
           <div class="caminhos-hold-grid">
             <div>
               <h3>Comunicação</h3>
@@ -246,28 +304,20 @@
       </div>
     </section>
 
-    <section class="pessoas" id="pessoas">
-      <div class="container pessoas-frame">
-        <header class="pessoas-open">
-          <h2 class="pessoas-whisper" data-pessoas="whisper">As pessoas</h2>
-          <div class="pessoas-mark">
-            <div
-              class="hand-stage pessoas-hand"
-              id="pessoas-hand"
-              role="img"
-              aria-label="Mão em datilologia da Libras. Soletra a inicial de cada pessoa ao passar por ela"
-            ></div>
-            <p class="pessoas-hook" data-pessoas="hook">Time 2026.2</p>
-          </div>
+    <section class="pessoas lp-section lp-section--lilac" id="pessoas">
+      <div class="container lp-shell lp-shell--wide">
+        <header class="lp-head pessoas-open">
+          <p class="lp-kicker pessoas-whisper" data-pessoas="whisper">As pessoas</p>
+          <h2 class="lp-display lp-display--hook pessoas-hook" data-pessoas="hook">Time 2026.2</h2>
         </header>
-        <div id="pessoas-list"></div>
+        <div class="pessoas-list" id="pessoas-list"></div>
       </div>
     </section>
   </main>
 
-  <footer class="tempo" id="tempo">
-    <div class="container tempo-frame">
-      <p class="tempo-whisper" data-tempo="whisper">Este tempo</p>
+  <footer class="tempo lp-section lp-section--footer" id="tempo">
+    <div class="container lp-shell tempo-frame">
+      <p class="lp-kicker tempo-whisper" data-tempo="whisper">Este tempo</p>
       <p class="tempo-year" data-tempo="year">Time 2026.2</p>
       <p class="tempo-line" data-tempo="line">O capítulo que a liga vive agora.</p>
       <img
@@ -277,12 +327,13 @@
         alt="Brasão da LILAS"
         width="88"
         height="88"
+        loading="lazy"
+        decoding="async"
       />
       <p class="tempo-meta" data-tempo="meta">CCS · UNIFOR</p>
     </div>
   </footer>
 
-  <script src="hand.js"></script>
-  <script src="script.js"></script>
+  <script src="script.js" defer></script>
 </body>
 </html>
