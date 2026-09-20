@@ -10,74 +10,117 @@
   <meta property="og:type" content="website" />
   <meta property="og:image" content="assets/brand/logo.png" />
   <link rel="icon" href="assets/brand/logo.png" type="image/png" />
+  <link rel="preload" as="image" href="assets/brand/team-hero.png" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,500;1,9..144,600&family=Outfit:wght@400;500;600&family=Fredoka:wght@500;600;700&family=Nunito:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
   <a class="skip-link" href="#conteudo">Ir para o conteúdo</a>
 
   <header class="site-header" id="topo">
-    <div class="container header-inner">
-      <a class="brand" href="#inicio" aria-label="LILAS — início">
-        <img src="assets/brand/logo.png" alt="" width="44" height="44" />
-        <span>LILAS</span>
-      </a>
+    <div class="header-bar">
+      <a class="brand" href="#inicio" aria-label="LILAS — início">LILAS</a>
 
       <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="menu" aria-label="Abrir menu">
-        <span></span><span></span><span></span>
+        <span></span><span></span>
       </button>
 
       <nav class="nav" id="menu" aria-label="Principal">
-        <a href="#inicio">Encontro</a>
-        <a href="#escuta">A escuta</a>
-        <a href="#gesto">O gesto</a>
-        <a href="#caminhos">Os caminhos</a>
-        <a href="#pessoas">As pessoas</a>
+        <a href="#escuta">História</a>
+        <a href="#gesto">Propósito</a>
+        <a href="#caminhos">Atuação</a>
+        <a href="#pessoas">Time</a>
+        <a
+          class="nav-ig"
+          href="https://www.instagram.com/lilasunifor/"
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label="Instagram da LILAS, @lilasunifor"
+        >Instagram</a>
       </nav>
     </div>
   </header>
 
   <main id="conteudo">
-    <section class="encontro" id="inicio">
-      <div class="encontro-bg" aria-hidden="true">
-        <span class="orb orb-a"></span>
-        <span class="orb orb-b"></span>
-        <span class="orb orb-c"></span>
+    <section class="hero" id="inicio" aria-labelledby="hero-name">
+      <div class="hero-bg" aria-hidden="true">
+        <span class="hero-orb hero-orb-a"></span>
+        <span class="hero-orb hero-orb-b"></span>
+        <span class="hero-orb hero-orb-c"></span>
+        <span class="hero-grain"></span>
+        <span class="hero-veil"></span>
+        <svg class="hero-gesture" viewBox="0 0 1440 900" preserveAspectRatio="none">
+          <path pathLength="1" d="M-20 210 C 180 140, 320 320, 520 280 S 820 120, 980 240 S 1280 420, 1480 310" />
+        </svg>
       </div>
 
-      <div class="container encontro-frame">
-        <p class="encontro-whisper" data-encontro="whisper">A liga se apresenta</p>
-
-        <div
-          class="hand-stage encontro-hand"
-          id="lilas-hand"
-          role="img"
-          aria-label="Mão em datilologia da Libras soletrando LILAS"
-        ></div>
-
-        <h1 class="encontro-name" data-encontro="name" aria-label="LILAS">
-          <span data-glyph="0">L</span>
-          <span data-glyph="1">I</span>
-          <span data-glyph="2">L</span>
-          <span data-glyph="3">A</span>
-          <span data-glyph="4">S</span>
-        </h1>
-
-        <p class="encontro-full" data-encontro="full">
-          Liga de Libras e Atenção à Saúde da Pessoa Surda
+      <div class="hero-stage">
+        <p class="hero-sign">
+          <span>Liga de Libras e Atenção</span>
+          <span>à Saúde da Pessoa Surda</span>
         </p>
-        <p class="encontro-meta" data-encontro="meta">CCS · UNIFOR · Time 2026.2</p>
 
-        <img
-          class="encontro-seal"
-          data-encontro="seal"
-          src="assets/brand/logo.png"
-          alt="Brasão da LILAS"
-          width="96"
-          height="96"
-        />
+        <div class="hero-core">
+          <h1 class="hero-name" id="hero-name">LILAS</h1>
+          <figure class="hero-photo">
+            <div class="hero-photo-in">
+              <img
+                src="assets/brand/team-hero.png"
+                alt="Time 2026.2 da LILAS, integrantes com as camisas da liga"
+                width="1280"
+                height="800"
+                fetchpriority="high"
+                decoding="async"
+              />
+            </div>
+          </figure>
+        </div>
+
+        <p class="hero-line">
+          Comunicação que inclui.<br />
+          Cuidado que alcança.
+        </p>
+
+        <dl class="hero-meta">
+          <div>
+            <dt class="sr-only">Fundação</dt>
+            <dd>Desde 2020</dd>
+          </div>
+          <div>
+            <dt class="sr-only">Instituição</dt>
+            <dd>CCS · UNIFOR</dd>
+          </div>
+          <div>
+            <dt class="sr-only">Equipe atual</dt>
+            <dd>Time 2026.2</dd>
+          </div>
+        </dl>
+
+        <a class="hero-scroll" href="#manifesto">
+          <span>Conhecer</span>
+          <span aria-hidden="true">↓</span>
+        </a>
+      </div>
+    </section>
+
+    <section class="manifesto" id="manifesto" aria-labelledby="manifesto-title">
+      <div class="manifesto-flow" aria-hidden="true">
+        <svg viewBox="0 0 1440 420" preserveAspectRatio="none">
+          <path pathLength="1" d="M-40 80 C 220 20, 360 220, 620 160 S 980 40, 1180 180 S 1360 320, 1500 240" />
+        </svg>
+      </div>
+
+      <div class="manifesto-frame">
+        <h2 class="manifesto-title" id="manifesto-title">
+          <span data-manifesto="1">Escutar</span>
+          <span data-manifesto="2">também é</span>
+          <span data-manifesto="3">Ver.</span>
+        </h2>
+        <p class="manifesto-after" data-manifesto="4">
+          Cuidar também é construir caminhos para que a comunicação aconteça.
+        </p>
       </div>
     </section>
 

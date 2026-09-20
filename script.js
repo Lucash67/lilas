@@ -178,33 +178,65 @@ function renderPessoas() {
 }
 
 function setupNav() {
+  const header = document.querySelector(".site-header");
   const toggle = document.querySelector(".nav-toggle");
   const nav = document.getElementById("menu");
-  if (!toggle || !nav) return;
+  if (!header || !toggle || !nav) return;
 
   const close = () => {
+    header.classList.remove("is-open");
     nav.classList.remove("is-open");
     toggle.setAttribute("aria-expanded", "false");
     toggle.setAttribute("aria-label", "Abrir menu");
+    document.body.classList.remove("nav-lock");
+  };
+
+  const open = () => {
+    header.classList.add("is-open");
+    nav.classList.add("is-open");
+    toggle.setAttribute("aria-expanded", "true");
+    toggle.setAttribute("aria-label", "Fechar menu");
+    document.body.classList.add("nav-lock");
+    const first = nav.querySelector("a");
+    if (first) first.focus();
   };
 
   toggle.addEventListener("click", () => {
-    const open = nav.classList.toggle("is-open");
-    toggle.setAttribute("aria-expanded", open ? "true" : "false");
-    toggle.setAttribute("aria-label", open ? "Fechar menu" : "Abrir menu");
+    nav.classList.contains("is-open") ? close() : open();
   });
 
   nav.querySelectorAll("a").forEach((link) => link.addEventListener("click", close));
+
+  document.addEventListener("keydown", (event) => {
+    if (event.key === "Escape") close();
+    if (!nav.classList.contains("is-open") || event.key !== "Tab") return;
+
+    const focusable = [toggle, ...nav.querySelectorAll("a")];
+    const first = focusable[0];
+    const last = focusable[focusable.length - 1];
+    if (event.shiftKey && document.activeElement === first) {
+      event.preventDefault();
+      last.focus();
+    } else if (!event.shiftKey && document.activeElement === last) {
+      event.preventDefault();
+      first.focus();
+    }
+  });
 }
 
 function setupHeaderScroll() {
   const header = document.querySelector(".site-header");
+  const manifesto = document.querySelector(".manifesto");
+  const next = document.getElementById("escuta");
   if (!header) return;
 
   const onScroll = () => {
-    const scrolled = window.scrollY > 12;
-    header.classList.toggle("is-scrolled", scrolled);
-    header.style.boxShadow = scrolled ? "0 8px 24px rgba(156, 38, 151, 0.08)" : "none";
+    header.classList.toggle("is-scrolled", window.scrollY > 18);
+    if (!manifesto) return;
+
+    const top = manifesto.getBoundingClientRect().top;
+    const nextTop = next ? next.getBoundingClientRect().top : Number.POSITIVE_INFINITY;
+    header.classList.toggle("is-on-dark", top < 96 && nextTop > 64);
   };
 
   onScroll();
@@ -281,57 +313,87 @@ function setupNavWatch() {
   pairs.forEach(({ section }) => observer.observe(section));
 }
 
-function setupEncontro() {
-  const el = document.getElementById("lilas-hand");
-  if (!el || !window.LilasHand) return;
+function setupHero() {
+  const hero = document.querySelector(".hero");
+  if (!hero) return;
 
-  const root = document.querySelector(".encontro");
-  const glyphs = [...document.querySelectorAll(".encontro-name [data-glyph]")];
-  const reveal = (name) => {
-    const node = document.querySelector(`[data-encontro="${name}"]`);
-    if (node) node.classList.add("is-in");
+  const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  window.requestAnimationFrame(() => hero.classList.add("is-ready"));
+
+  const setOpen = (value) => {
+    const next = Math.max(0, Math.min(1, value));
+    hero.style.setProperty("--open", next.toFixed(4));
   };
 
-  const hand = window.LilasHand.mount(el);
+  if (reduced) {
+    setOpen(0);
+    return;
+  }
+
+  let mx = 0;
+  let my = 0;
+  let tx = 0;
+  let ty = 0;
+  let ticking = 0;
+
+  const tick = () => {
+    mx += (tx - mx) * 0.08;
+    my += (ty - my) * 0.08;
+    hero.style.setProperty("--mx", mx.toFixed(4));
+    hero.style.setProperty("--my", my.toFixed(4));
+    ticking = 0;
+  };
+
+  if (window.matchMedia("(pointer: fine)").matches) {
+    window.addEventListener(
+      "pointermove",
+      (event) => {
+        const rect = hero.getBoundingClientRect();
+        if (rect.bottom < 0 || rect.top > window.innerHeight) return;
+        tx = ((event.clientX / window.innerWidth) - 0.5) * 2;
+        ty = ((event.clientY / window.innerHeight) - 0.5) * 2;
+        if (!ticking) ticking = window.requestAnimationFrame(tick);
+      },
+      { passive: true }
+    );
+  }
+
+  const onScroll = () => {
+    const rect = hero.getBoundingClientRect();
+    const span = Math.max(rect.height * 0.7, 1);
+    setOpen(-rect.top / span);
+  };
+
+  onScroll();
+  window.addEventListener("scroll", onScroll, { passive: true });
+}
+
+function setupManifesto() {
+  const section = document.querySelector(".manifesto");
+  if (!section) return;
+
+  const lines = [...section.querySelectorAll("[data-manifesto]")];
   const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-  if (root) root.classList.add("is-ready");
-  reveal("whisper");
+  if (reduced) {
+    lines.forEach((line) => line.classList.add("is-in"));
+    return;
+  }
 
-  const play = async () => {
-    if (reduced) {
-      glyphs.forEach((glyph) => glyph.classList.add("is-on"));
-      reveal("name");
-      reveal("full");
-      reveal("meta");
-      reveal("seal");
-      await hand.show("L");
-      hand.idle();
-      return;
-    }
+  const onScroll = () => {
+    const rect = section.getBoundingClientRect();
+    const view = window.innerHeight;
+    const progress = Math.max(0, Math.min(1, (view * 0.78 - rect.top) / Math.max(rect.height * 0.55, 1)));
+    section.style.setProperty("--reveal", progress.toFixed(4));
 
-    await hand.spell("LILAS", {
-      hold: 380,
-      move: 260,
-      chips: false,
-      onLetter(index) {
-        reveal("name");
-        glyphs.forEach((glyph, i) => {
-          glyph.classList.toggle("is-on", i === index);
-          glyph.classList.toggle("is-done", i <= index);
-        });
-      },
+    lines.forEach((line) => {
+      const at = Number(line.getAttribute("data-manifesto")) * 0.16;
+      line.classList.toggle("is-in", progress > at);
     });
-
-    await hand.show("L");
-    reveal("full");
-    window.setTimeout(() => reveal("meta"), 180);
-    window.setTimeout(() => reveal("seal"), 360);
-    hand.idle();
   };
 
-  play();
-  bindHandScene(root, hand);
+  onScroll();
+  window.addEventListener("scroll", onScroll, { passive: true });
 }
 
 function setupEscuta() {
@@ -623,7 +685,8 @@ setupNavWatch();
 setupHeaderScroll();
 renderPessoas();
 setupReveal();
-setupEncontro();
+setupHero();
+setupManifesto();
 setupEscuta();
 setupGesto();
 setupCaminhos();
